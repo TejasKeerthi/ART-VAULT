@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ArtVault | Digital Art Showcase</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <!-- Model Viewer -->
+  <script type="module" src="https://unpkg.com/@google/model-viewer@3.5.0/dist/model-viewer.min.js"></script>
+
+  <!-- Optional: Three.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+  <style>
+    body { background-color: #0D0D0D; color: #F5F5F5; font-family: 'Inter', sans-serif; }
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #1a1a1a; }
+    ::-webkit-scrollbar-thumb { background: #444; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #555; }
+
+    model-viewer, .gallery-image {
+      width: 100%;
+      height: 400px;
+      border-radius: 1rem;
+      background-color: #1a1a1a;
+      object-fit: cover;
+    }
+    .card-overlay { opacity: 0; transition: opacity 0.3s ease-in-out; }
+    .group:hover .card-overlay { opacity: 1; }
+  </style>
+</head>
+
+<body class="antialiased">
+
+  <!-- Header -->
+  <header class="sticky top-0 z-50 bg-black/50 backdrop-blur-lg border-b border-gray-800">
+    <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+      <div class="text-2xl font-bold tracking-wider">ArtVault <span class="text-purple-400">.</span></div>
+      <div id="header-actions" class="flex items-center space-x-4"></div>
+    </nav>
+  </header>
+
+  <!-- Gallery -->
+  <main class="container mx-auto px-6 py-12">
+    <div class="text-center mb-12">
+      <h1 class="text-4xl md:text-5xl font-bold mb-2">Explore the Collection</h1>
+      <p class="text-lg text-gray-400">Own a piece of the future. The world's finest digital art awaits.</p>
+    </div>
+
+    <div id="gallery-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+
+      <!-- Example Artwork -->
+      <div class="group relative" data-description="Crimson Tide. An abstract digital painting with swirling patterns of red, black, and gold.">
+        <img src="https://placehold.co/600x800/2D033B/FFFFFF?text=Crimson+Tide" alt="Crimson Tide" class="gallery-image">
+        <div class="absolute inset-0 bg-black/60 card-overlay rounded-lg flex items-center justify-center space-x-2">
+          <button class="audio-btn p-3 bg-white/20 rounded-full hover:bg-white/30">🔊</button>
+          <button class="buy-now-btn font-bold bg-purple-600 text-white py-3 px-6 rounded-lg hover:bg-purple-700">Buy NFT</button>
+        </div>
+        <div class="mt-4 flex justify-between items-center">
+          <div><h3 class="text-xl font-bold">Crimson Tide</h3><p class="text-gray-400">By AuraFlow</p></div>
+          <div class="text-lg font-bold">0.5 ETH</div>
+        </div>
+      </div>
+
+      <!-- Example 3D Artwork -->
+      <div class="group relative" data-description="The Scholar. A detailed 3D sculpture of an astronaut.">
+        <model-viewer src="https://modelviewer.dev/shared-assets/models/Astronaut.glb" alt="A 3D model of an astronaut" ar camera-controls auto-rotate shadow-intensity="1"></model-viewer>
+        <div class="absolute inset-0 bg-black/60 card-overlay rounded-lg flex items-center justify-center space-x-2">
+          <button class="audio-btn p-3 bg-white/20 rounded-full hover:bg-white/30">🔊</button>
+          <button class="buy-now-btn font-bold bg-purple-600 text-white py-3 px-6 rounded-lg hover:bg-purple-700">Buy NFT</button>
+        </div>
+        <div class="mt-4 flex justify-between items-center">
+          <div><h3 class="text-xl font-bold">The Scholar (3D)</h3><p class="text-gray-400">By PolygonCreator</p></div>
+          <div class="text-lg font-bold">1.2 ETH</div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Create Modal -->
+  <div id="create-modal" class="modal-container fixed inset-0 z-50 bg-black/80 justify-center items-center hidden">
+    <div class="bg-[#1a1a1a] rounded-xl shadow-lg w-full max-w-4xl p-8 relative">
+      <button id="close-create-modal-btn" class="absolute top-4 right-4 text-gray-500 hover:text-white text-3xl">&times;</button>
+      <h2 class="text-2xl font-bold mb-6">Create Your Artwork</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="space-y-6">
+          <input type="file" id="image-upload" accept="image/*" class="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-purple-600 file:text-white hover:file:bg-purple-700 cursor-pointer"/>
+          <input type="text" id="art-title" placeholder="Title" class="w-full bg-gray-800 border-gray-700 rounded-lg p-2 text-white">
+          <input type="number" id="art-price" placeholder="Price (ETH)" step="0.01" min="0" class="w-full bg-gray-800 border-gray-700 rounded-lg p-2 text-white">
+          <textarea id="art-description" rows="3" placeholder="Description..." class="w-full bg-gray-800 border-gray-700 rounded-lg p-2 text-white"></textarea>
+          <button id="add-to-gallery-btn" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-4 rounded-lg">Add to Gallery</button>
+        </div>
+        <div id="create-preview-container" class="rounded-lg bg-black min-h-[300px] flex items-center justify-center">
+          <p class="text-gray-500">Your preview will appear here</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Profile Modal -->
+  <div id="profile-modal" class="modal-container fixed inset-0 z-50 bg-black/80 justify-center items-center hidden">
+    <div class="bg-[#1a1a1a] rounded-xl shadow-lg w-full max-w-3xl p-8 relative">
+      <button id="close-profile-btn" class="absolute top-4 right-4 text-gray-500 hover:text-white text-3xl">&times;</button>
+      <h2 class="text-2xl font-bold mb-6">My Profile</h2>
+      <div id="profile-info" class="text-gray-300 mb-6"></div>
+      <h3 class="text-xl font-semibold mb-3 text-purple-400">My Artworks</h3>
+      <div id="my-artworks" class="grid grid-cols-1 sm:grid-cols-2 gap-6"></div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="border-t border-gray-800 mt-20">
+    <div class="container mx-auto px-6 py-8 text-center text-gray-500">
+      <h4 class="font-semibold mb-2">Project Team</h4>
+      <div class="flex justify-center space-x-4">
+        <span>KEERTHI TEJAS</span>
+        <span>MANDADAPU LOKESH</span>
+        <span>SHLOK JELLA</span>
+      </div>
+      <p class="mt-6">&copy; 2025 ArtVault.</p>
+    </div>
+  </footer>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>  
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
+
+  <script>
+document.addEventListener("DOMContentLoaded", () => {
+  const firebaseConfig = {
+    apiKey: "AIzaSyBp0WZ3oXBAXBV2cuCs75mBS3mpuMq6JSM",
+    authDomain: "art-vault-a2426.firebaseapp.com",
+    projectId: "art-vault-a2426",
+    storageBucket: "art-vault-a2426.firebasestorage.app",
+    messagingSenderId: "723439133209",
+    appId: "1:723439133209:web:d13517961c82690cd84088"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+  const auth = firebase.auth();
+
+  const headerActions = document.getElementById("header-actions");
+  const createModal = document.getElementById("create-modal");
+  const closeCreateModalBtn = document.getElementById("close-create-modal-btn");
+  const imageUpload = document.getElementById("image-upload");
+  const artTitleInput = document.getElementById("art-title");
+  const artPriceInput = document.getElementById("art-price");
+  const artDescriptionInput = document.getElementById("art-description");
+  const addToGalleryBtn = document.getElementById("add-to-gallery-btn");
+  const galleryGrid = document.getElementById("gallery-grid");
+  const previewContainer = document.getElementById("create-preview-container");
+  let currentImageUrl = null;
+
+  // --- HEADER UI ---
+  function updateHeaderUI() {
+    const wallet = localStorage.getItem("walletAddress") || "Connect Wallet";
+    headerActions.innerHTML = `
+      <button id="connect-wallet-btn" class="border border-gray-600 hover:bg-gray-800 text-white font-semibold py-2 px-5 rounded-lg">${wallet.length>12?wallet.slice(0,6)+"..."+wallet.slice(-4):wallet}</button>
+      <button id="show-create-modal-btn" class="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-5 rounded-lg">Create</button>
+      <button id="logout-btn" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-5 rounded-lg">Logout</button>
+    `;
+    document.getElementById("connect-wallet-btn").addEventListener("click", connectWallet);
+    document.getElementById("show-create-modal-btn").addEventListener("click", () => {
+      createModal.classList.remove("hidden");
+      createModal.classList.add("flex");
+    });
+    document.getElementById("logout-btn").addEventListener("click", () => auth.signOut());
+  }
+
+  async function connectWallet() {
+    if (window.ethereum) {
+      try {
+        const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+        localStorage.setItem("walletAddress", accounts[0]);
+        updateHeaderUI();
+      } catch (err) {
+        alert("Wallet connection failed.");
+      }
+    } else {
+      alert("MetaMask not detected.");
+    }
+  }
+
+  // --- CLOSE MODAL ---
+  closeCreateModalBtn.addEventListener("click", () => {
+    createModal.classList.add("hidden");
+    createModal.classList.remove("flex");
+  });
+
+  // --- PREVIEW SELECTED IMAGE ---
+  imageUpload.addEventListener("change", (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      currentImageUrl = ev.target.result;
+      previewContainer.innerHTML = `<img src="${currentImageUrl}" class="rounded-lg max-h-[300px] object-contain" />`;
+    };
+    reader.readAsDataURL(file);
+  });
+
+  // --- ADD ARTWORK ---
+  addToGalleryBtn.addEventListener("click", async () => {
+    const title = artTitleInput.value.trim();
+    const price = artPriceInput.value.trim();
+    const description = artDescriptionInput.value.trim();
+    const file = imageUpload.files[0];
+    const wallet = localStorage.getItem("walletAddress");
+    const user = auth.currentUser;
+    const imgbbKey = "867f0ed6425ab2e102603c19f93128b9";
+
+    if (!title || !price || !description || !file) {
+      alert("Please fill all fields and upload an image.");
+      return;
+    }
+
+    try {
+      // --- Upload to ImgBB ---
+      const form = new FormData();
+      form.append("image", file);
+      const res = await fetch(`https://api.imgbb.com/1/upload?key=${imgbbKey}`, {
+        method: "POST",
+        body: form
+      });
+      const data = await res.json();
+      if (!data.success) throw new Error("ImgBB upload failed");
+      const imageUrl = data.data.url;
+
+      // --- Save to Firestore ---
+      await db.collection("artworks").add({
+        title,
+        price,
+        description,
+        imageUrl,
+        creator: user?.email || "anonymous",
+        creatorUid: user?.uid || null,
+        wallet,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+
+      alert("✅ Artwork uploaded successfully!");
+      createModal.classList.add("hidden");
+      createModal.classList.remove("flex");
+    } catch (err) {
+      alert("Upload failed: " + err.message);
+    }
+  });
+
+  // --- REALTIME GALLERY LOADER ---
+  function loadGalleryRealtime() {
+    db.collection("artworks")
+      .orderBy("createdAt", "desc")
+      .onSnapshot((snapshot) => {
+        galleryGrid.innerHTML = "";
+        snapshot.forEach((doc) => {
+          const art = doc.data();
+          const card = document.createElement("div");
+          card.className = "group relative";
+          card.setAttribute("data-description", art.description || "");
+          card.innerHTML = `
+            <img src="${art.imageUrl}" class="gallery-image rounded-lg" alt="${art.title}">
+            <div class="absolute inset-0 bg-black/60 card-overlay rounded-lg flex items-center justify-center space-x-2">
+              <button class="audio-btn p-3 bg-white/20 rounded-full hover:bg-white/30">🔊</button>
+              <button class="buy-now-btn font-bold bg-purple-600 text-white py-3 px-6 rounded-lg hover:bg-purple-700">Buy NFT</button>
+            </div>
+            <div class="mt-4 flex justify-between items-center">
+              <div>
+                <h3 class="text-xl font-bold">${art.title}</h3>
+                <p class="text-gray-400">By ${art.creator}</p>
+              </div>
+              <div class="text-lg font-bold">${art.price} ETH</div>
+            </div>
+          `;
+          galleryGrid.appendChild(card);
+
+          card.querySelector(".audio-btn").addEventListener("click", () => {
+            speechSynthesis.cancel();
+            speechSynthesis.speak(new SpeechSynthesisUtterance(art.description));
+          });
+          card.querySelector(".buy-now-btn").addEventListener("click", () => {
+            const wallet = localStorage.getItem("walletAddress");
+            if (!wallet) return alert("Connect wallet first.");
+            alert(`NFT purchased: ${art.title}\nWallet: ${wallet}`);
+          });
+        });
+      });
+  }
+
+  // --- AUTH STATE ---
+  auth.onAuthStateChanged((user) => {
+    if (user) {
+      updateHeaderUI();
+      loadGalleryRealtime(); // 🔥 Now gallery loads immediately for signed-in users
+    } else {
+      headerActions.innerHTML = `<a href="login.html" class="text-white border border-gray-600 py-2 px-5 rounded-lg hover:bg-gray-800">Login</a>`;
+      galleryGrid.innerHTML = `<p class='text-gray-400 text-center'>Please log in to view artworks.</p>`;
+    }
+  });
+});
+</script>
+
+</body>
+</html>

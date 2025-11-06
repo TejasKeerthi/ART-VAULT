@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | ArtVault</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    
+    <style>
+        body { background-color: #0D0D0D; color: #F5F5F5; font-family: 'Inter', sans-serif; }
+        .signup-field { display: none; }
+    </style>
+</head>
+<body class="flex min-h-screen flex-col items-center justify-center antialiased">
+
+    <div class="w-full max-w-md rounded-xl bg-[#1a1a1a] p-8 shadow-lg">
+        <div class="mb-8 text-center">
+            <h1 class="text-3xl font-bold tracking-wider">
+                ArtVault <span class="text-purple-400">.</span>
+            </h1>
+            <p id="form-subtitle" class="mt-2 text-lg text-gray-400">Sign in to your account</p>
+        </div>
+
+        <div class="space-y-4">
+            <button id="google-login-btn" class="flex w-full items-center justify-center gap-3 rounded-lg border border-gray-700 bg-gray-800 py-3 px-4 font-semibold text-white transition-colors hover:bg-gray-700">
+                <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 512"><path fill="currentColor" d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 126 23.4 172.9 61.9l-65.7 64.9C337 99.2 293.7 80 248 80c-80.9 0-146.5 65.6-146.5 146.5S167.1 373 248 373c90.1 0 131.2-63.5 136-98.6H248v-85.3h236.1c2.3 12.7 3.9 26.9 3.9 41.4z"/></svg>
+                Continue with Google
+            </button>
+            
+        </div>
+
+        <div class="my-8 flex items-center gap-4">
+            <hr class="w-full border-gray-700">
+            <span class="text-sm text-gray-500">OR</span>
+            <hr class="w-full border-gray-700">
+        </div>
+
+        <form id="login-form" class="space-y-6" data-mode="login">
+            <div id="name-field-container" class="signup-field">
+                <label for="name" class="mb-2 block text-sm font-medium text-gray-300">Full Name</label>
+                <input type="text" id="name" placeholder="Ada Lovelace" class="w-full rounded-lg border-gray-700 bg-gray-800 p-3 text-white focus:border-purple-500 focus:ring-purple-500">
+            </div>
+            
+            <div>
+                <label for="email" class="mb-2 block text-sm font-medium text-gray-300">Email Address</label>
+                <input type="email" id="email" placeholder="you@example.com" required class="w-full rounded-lg border-gray-700 bg-gray-800 p-3 text-white focus:border-purple-500 focus:ring-purple-500">
+            </div>
+            
+            <div>
+                <label for="password" class="mb-2 block text-sm font-medium text-gray-300">Password</B></label>
+                <input type="password" id="password" placeholder="••••••••" required class="w-full rounded-lg border-gray-700 bg-gray-800 p-3 text-white focus:border-purple-500 focus:ring-purple-500">
+            </div>
+
+            <div id="role-field-container" class="signup-field">
+                <label for="role" class="mb-2 block text-sm font-medium text-gray-300">Sign up as a:</label>
+                <select id="role" class="w-full rounded-lg border-gray-700 bg-gray-800 p-3 text-white focus:border-purple-500 focus:ring-purple-500">
+                    <option value="consumer" selected>Consumer (Collector)</option>
+                    <option value="creator">Creator (Artist)</option>
+                </select>
+            </div>
+
+            <button id="submit-btn" type="submit" class="w-full rounded-lg bg-purple-600 py-3 px-4 font-bold text-white transition-colors hover:bg-purple-700">
+                Sign In
+            </button>
+        </form>
+
+        <p id="error-message" class="mt-4 text-center text-sm text-red-400"></p>
+
+        <p class="mt-6 text-center text-sm text-gray-400">
+            <span id="toggle-prompt">Don't have an account?</span>
+            <button id="toggle-mode-btn" class="font-semibold text-purple-400 hover:text-purple-300">
+                Sign Up
+            </button>
+        </p>
+    </div>
+
+    <script src="login.js"></script>
+</body>
+</html>
